@@ -22,5 +22,5 @@ const bootstrap = (app) => {
 		})
 	})
 }
-//mostafa
+//mostafaa
 export default bootstrap
