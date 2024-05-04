@@ -71,8 +71,8 @@ export const makePaymentSession = catchAsyncError(async (req, res) => {
       },
     ],
     mode:"payment",
-    success_url:'',
-    cancel_url:"",
+    success_url:'https://chatgpt.com/',
+    cancel_url:"https://chatgpt.com/",
     client_reference_id:cart._id,
 
   });

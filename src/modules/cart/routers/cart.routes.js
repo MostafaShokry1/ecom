@@ -14,12 +14,12 @@ const router = Router()
 router.route('/').get(authenticate, authorize(ROLES.USER), assertCart, getCart)
 router
 	.route('/add')
-	.put(authenticate, authorize(ROLES.USER), assertCart, addToCart)
+	.post(authenticate, authorize(ROLES.USER), assertCart, addToCart)
 router
 	.route('/remove')
-	.put(authenticate, authorize(ROLES.USER), assertCart, removeFromCart)
+	.post(authenticate, authorize(ROLES.USER), assertCart, removeFromCart)
 router
 	.route('/coupon')
-	.put(authenticate, authorize(ROLES.USER), assertCart, applyCoupon)
+	.post(authenticate, authorize(ROLES.USER), assertCart, applyCoupon)
 
 export default router
