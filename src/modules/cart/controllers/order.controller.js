@@ -74,7 +74,7 @@ export const makePaymentSession = catchAsyncError(async (req, res) => {
     mode: "payment",
     success_url: "https://chatgpt.com/",
     cancel_url: "https://chatgpt.com/",
-    client_reference_id: cart._id,
+    client_reference_id: cart.user_id,
     customer_email: req.user.email,
     metadata:{
       address:req.body.address
@@ -85,7 +85,9 @@ export const makePaymentSession = catchAsyncError(async (req, res) => {
 export const makeOnlinePayment= async(data)=>{
   const {customer_email}=data
   const user =await userModel.findOne({email:customer_email})
+  console.log({user});
   const cart=await cartModel.findOne({user_id:user._id})
+  console.log({cart});
   const order= await orderModel.create({
     user_id:user._id,
     address:"zagazig", 
