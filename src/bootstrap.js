@@ -27,6 +27,7 @@ const bootstrap = (app) => {
       switch (event.type) {
         case "checkout.session.completed":
           const data = event.data.object;
+					console.log({data});
           // Then define and call a function to handle the event checkout.session.completed
           break;
         // ... handle other event types

@@ -70,11 +70,11 @@ export const makePaymentSession = catchAsyncError(async (req, res) => {
         quantity: 1,
       },
     ],
-    mode:"payment",
-    success_url:'https://chatgpt.com/',
-    cancel_url:"https://chatgpt.com/",
-    client_reference_id:cart._id,
-
+    mode: "payment",
+    success_url: "https://chatgpt.com/",
+    cancel_url: "https://chatgpt.com/",
+    client_reference_id: cart.user_id,
+    customer_email: req.user.email,
   });
-  res.json({session})
+  res.json({ session });
 });
