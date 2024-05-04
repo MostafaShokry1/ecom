@@ -6,6 +6,7 @@ import couponModel from "../../coupon/models/coupon.model.js";
 import productModel from "../../product/models/product.model.js";
 import cartModel from "../models/cart.model.js";
 import orderModel from "../models/order.model.js";
+import userModel from "../../user/models/user.model.js";
 dotenv.config();
 const stripe = new Stripe(process.env.STRIPE_SECRET);
 
@@ -73,8 +74,37 @@ export const makePaymentSession = catchAsyncError(async (req, res) => {
     mode: "payment",
     success_url: "https://chatgpt.com/",
     cancel_url: "https://chatgpt.com/",
-    client_reference_id: cart.user_id,
+    client_reference_id: cart._id,
     customer_email: req.user.email,
+    metadata:{
+      address:req.body.address
+    }
   });
   res.json({ session });
 });
+export const makeOnlinePayment= async(data)=>{
+  const {customer_email}=data
+  const user =await userModel.findOne({email:customer_email})
+  const cart=await cartModel.findOne({user_id:user._id})
+  const order= await orderModel.create({
+    user_id:user._id,
+    address:"zagazig", 
+    coupon: {
+      discount: cart.coupon_id?.discount || 0,
+    },
+    is_paid:true,
+    products:cart.products.map(
+      ({ product_id: { title, price, discounted_price }, quantity }) => ({
+        quantity,
+        product: {
+          title,
+          price,
+          discounted_price,
+        },
+      })
+    ),
+    phone_Number:""
+  })
+
+
+}

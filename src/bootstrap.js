@@ -1,17 +1,18 @@
 import express from "express";
 import morgan from "morgan";
-import { AppError } from "./utils/error.handler.js";
+import { AppError, catchAsyncError } from "./utils/error.handler.js";
 import v1Router from "./routers/v1.routes.js";
 import stripe from "stripe";
+import { makeOnlinePayment } from "./modules/cart/controllers/order.controller.js";
 const bootstrap = (app) => {
   app.post(
     "/webhook",
     express.raw({ type: "application/json" }),
-    (request, response) => {
+    catchAsyncError(async (request, response) => {
       const sig = request.headers["stripe-signature"];
 
       let event;
- 
+
       try {
         event = stripe.webhooks.constructEvent(
           request.body,
@@ -27,7 +28,8 @@ const bootstrap = (app) => {
       switch (event.type) {
         case "checkout.session.completed":
           const data = event.data.object;
-					console.log({data});
+          await makeOnlinePayment(data);
+          console.log({ data });
           // Then define and call a function to handle the event checkout.session.completed
           break;
         // ... handle other event types
@@ -37,7 +39,7 @@ const bootstrap = (app) => {
 
       // Return a 200 response to acknowledge receipt of the event
       response.send();
-    }
+    })
   );
   app.use(express.json());
 
