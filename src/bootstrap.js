@@ -3,6 +3,7 @@ import morgan from "morgan";
 import { AppError, catchAsyncError } from "./utils/error.handler.js";
 import v1Router from "./routers/v1.routes.js";
 import stripe from "stripe";
+import cors from "cors"
 import { makeOnlinePayment } from "./modules/cart/controllers/order.controller.js";
 const bootstrap = (app) => {
   app.post(
@@ -42,7 +43,9 @@ const bootstrap = (app) => {
     })
   );
   app.use(express.json());
-
+  app.use(cors({
+    origin: 'http://localhost:3000' // replace 3000 with the port you are using
+  }));
   app.use(morgan("dev"));
 
   app.use("/api/v1", v1Router);

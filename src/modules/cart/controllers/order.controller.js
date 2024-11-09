@@ -7,6 +7,8 @@ import productModel from "../../product/models/product.model.js";
 import cartModel from "../models/cart.model.js";
 import orderModel from "../models/order.model.js";
 import userModel from "../../user/models/user.model.js";
+import { createInvoice } from "../../../utils/pdf.js";
+import { transporter } from "../../../utils/mailer.js";
 dotenv.config();
 const stripe = new Stripe(process.env.STRIPE_SECRET);
 
@@ -54,6 +56,37 @@ export const makeCODOrder = catchAsyncError(async (req, res) => {
     })
   );
   await productModel.bulkWrite(bulkWriteOptions);
+  //make invoice
+
+  const invoice = {
+    shipping: {
+      name: req.user.name,
+      address: req.body.address,
+    },
+    items: cart.products.map(
+      ({ product_id: { title, description, discounted_price }, quantity }) => ({
+        quantity,
+        item: title,
+        description,
+        amount: discounted_price * 100 * quantity,
+      })
+    ),
+    subtotal: cart.total_price * 100,
+    paid: 0,
+    invoice_nr: order._id,
+  };
+
+  createInvoice(invoice, "invoice.pdf");
+  await transporter.sendMail({
+    to: req.user.email,
+    attachments: [
+      {
+        path: "invoice.pdf",
+        contentType: "application/pdf",
+      },
+    ],
+  });
+  console.log(req.user.email);
   res.json({ order });
 });
 export const makePaymentSession = catchAsyncError(async (req, res) => {
@@ -76,26 +109,26 @@ export const makePaymentSession = catchAsyncError(async (req, res) => {
     cancel_url: "https://chatgpt.com/",
     client_reference_id: cart.user_id,
     customer_email: req.user.email,
-    metadata:{
-      address:req.body.address
-    }
+    metadata: {
+      address: req.body.address,
+    },
   });
   res.json({ session });
 });
-export const makeOnlinePayment= async(data)=>{
-  const {customer_email}=data
-  const user =await userModel.findOne({email:customer_email})
-  console.log({user});
-  const cart=await cartModel.findOne({user_id:user._id})
-  console.log({cart});
-  const order= await orderModel.create({
-    user_id:user._id,
-    address:"zagazig", 
+export const makeOnlinePayment = async (data) => {
+  const { customer_email } = data;
+  const user = await userModel.findOne({ email: customer_email });
+  console.log({ user });
+  const cart = await cartModel.findOne({ user_id: user._id });
+  console.log({ cart });
+  const order = await orderModel.create({
+    user_id: user._id,
+    address: "zagazig",
     coupon: {
       discount: cart.coupon_id?.discount || 0,
     },
-    is_paid:true,
-    products:cart.products.map(
+    is_paid: true,
+    products: cart.products.map(
       ({ product_id: { title, price, discounted_price }, quantity }) => ({
         quantity,
         product: {
@@ -105,8 +138,6 @@ export const makeOnlinePayment= async(data)=>{
         },
       })
     ),
-    phone_Number:""
-  })
-
-
-}
+    phone_Number: "",
+  });
+};

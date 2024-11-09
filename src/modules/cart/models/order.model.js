@@ -24,7 +24,7 @@ const orderSchema = new mongoose.Schema(
       discount: Number,
     },
     address: String,
-    phone_Number: Number,
+    phone_Number: String,
     payment_type: {
       type: String,
       enum: ["COD", "card"],

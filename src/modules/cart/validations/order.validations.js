@@ -4,7 +4,7 @@ import { schemas } from "../../../utils/schema.js";
 export const addOrderSchema = Joi.object({
   body: {
     address:Joi.string(),
-    phone_number: schemas.phone.required(),
+    phone_Number: schemas.phone.required(),
   },
   params: {},
   query: {},
