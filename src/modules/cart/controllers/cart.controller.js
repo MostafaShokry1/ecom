@@ -33,7 +33,7 @@ export const updateFromCart = catchAsyncError(async (req, res) => {
 
 	if (!productEntry) throw new AppError('Product not found', 404)
 
-	productEntry.quantity=+count
+	productEntry.quantity+=count
 
 	if (productEntry.quantity === 0) cart.products.remove(productEntry)
 
