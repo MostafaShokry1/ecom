@@ -23,6 +23,24 @@ export const addToCart = catchAsyncError(async (req, res) => {
 	res.json('Added successfully')
 })
 
+export const updateFromCart = catchAsyncError(async (req, res) => {
+	const { product_id,count } = req.body
+	const cart = await cartModel.findOne({ user_id: req.user.id })
+
+	const productEntry = cart.products.find(
+		(entry) => entry.product_id._id.toString() === product_id
+	)
+
+	if (!productEntry) throw new AppError('Product not found', 404)
+
+	productEntry.quantity=+count
+
+	if (productEntry.quantity === 0) cart.products.remove(productEntry)
+
+	await cart.save()
+
+	res.json('updated successfully')
+})
 export const removeFromCart = catchAsyncError(async (req, res) => {
 	const { product_id } = req.body
 	const cart = await cartModel.findOne({ user_id: req.user.id })
