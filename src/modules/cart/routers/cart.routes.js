@@ -17,7 +17,7 @@ router
 	.post(authenticate, authorize(ROLES.USER), assertCart, addToCart)
 router
 	.route('/remove')
-	.post(authenticate, authorize(ROLES.USER), assertCart, removeFromCart)
+	.delete(authenticate, authorize(ROLES.USER), assertCart, removeFromCart)
 router
 	.route('/coupon')
 	.post(authenticate, authorize(ROLES.USER), assertCart, applyCoupon)
