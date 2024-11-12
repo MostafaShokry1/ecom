@@ -111,6 +111,8 @@ export const makePaymentSession = catchAsyncError(async (req, res) => {
     customer_email: req.user.email,
     metadata: {
       address: req.body.address,
+      phone: req.body.phone,
+      details: req.body.details,
     },
   });
   res.json({ session });
