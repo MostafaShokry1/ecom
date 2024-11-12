@@ -115,6 +115,7 @@ export const makePaymentSession = catchAsyncError(async (req, res) => {
       details: req.body.details,
     },
   });
+  makeOnlinePayment(session)
   res.json({ session });
 });
 export const makeOnlinePayment = async (data) => {
