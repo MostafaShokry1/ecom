@@ -105,7 +105,7 @@ export const makePaymentSession = catchAsyncError(async (req, res) => {
       },
     ],
     mode: "payment",
-    success_url: "https://chatgpt.com/",
+    success_url: req.query.url,
     cancel_url: "https://chatgpt.com/",
     client_reference_id: cart.user_id,
     customer_email: req.user.email,
