@@ -115,12 +115,15 @@ export const makePaymentSession = catchAsyncError(async (req, res) => {
       details: req.body.details,
     },
   });
-  makeOnlinePayment(session)
+  await makeOnlinePayment(session);
+
   res.json({ session });
 });
 export const makeOnlinePayment = async (data) => {
   const { customer_email } = data;
-  const user = await userModel.findOne({ email: customer_email });
+  console.log(customer_email);
+
+  const user = await userModel.findOne({ email: customer_email});
   console.log({ user });
   const cart = await cartModel.findOne({ user_id: user._id });
   console.log({ cart });
@@ -142,5 +145,7 @@ export const makeOnlinePayment = async (data) => {
       })
     ),
     phone_Number: "",
+    payment_type: "card",
   });
+  console.log(order);
 };
