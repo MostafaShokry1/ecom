@@ -13,7 +13,7 @@ export const getCategories = catchAsyncError(async (req, res) => {
 	const apiFeatures = new ApiFeatures(
 		categoryModel.find(),
 		req.query
-	).paginate(10)
+	).paginate(15)
 	const categories = await apiFeatures.query
 	res.json({ categories })
 })
