@@ -118,19 +118,18 @@ export const makePaymentSession = catchAsyncError(async (req, res) => {
   res.json({ session });
 });
 export const makeOnlinePayment = async (data) => {
-  const { customer_email,metadata} = data;
+  const { customer_email, metadata } = data;
   console.log(customer_email);
   console.log(metadata.address);
   console.log(metadata.phone);
 
-  const user = await userModel.findOne({ email: customer_email});
+  const user = await userModel.findOne({ email: customer_email });
   console.log({ user });
   const cart = await cartModel.findOne({ user_id: user._id });
   console.log({ cart });
   const order = await orderModel.create({
     user_id: user._id,
     address: metadata.address,
-    phone_Number:metadata.phone,
     coupon: {
       discount: cart.coupon_id?.discount || 0,
     },
@@ -145,7 +144,7 @@ export const makeOnlinePayment = async (data) => {
         },
       })
     ),
-    phone_Number: "",
+    phone_Number: metadata.phone,
     payment_type: "card",
   });
   console.log(order);
