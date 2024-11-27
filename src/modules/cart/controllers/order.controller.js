@@ -115,13 +115,13 @@ export const makePaymentSession = catchAsyncError(async (req, res) => {
       details: req.body.details,
     },
   });
-  await makeOnlinePayment(session);
-
   res.json({ session });
 });
 export const makeOnlinePayment = async (data) => {
-  const { customer_email } = data;
+  const { customer_email,metadata} = data;
   console.log(customer_email);
+  console.log(metadata.address);
+  console.log(metadata.phone);
 
   const user = await userModel.findOne({ email: customer_email});
   console.log({ user });
@@ -129,7 +129,8 @@ export const makeOnlinePayment = async (data) => {
   console.log({ cart });
   const order = await orderModel.create({
     user_id: user._id,
-    address: "zagazig",
+    address: metadata.address,
+    phone_Number:metadata.phone,
     coupon: {
       discount: cart.coupon_id?.discount || 0,
     },
