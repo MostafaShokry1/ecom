@@ -47,7 +47,7 @@ const bootstrap = (app) => {
 
   app.use(
     cors({
-      origin: "http://localhost:3000", // replace 3000 with the port you are using
+      origin: "*", // replace 3000 with the port you are using
     })
   );
   app.use(morgan("dev"));
