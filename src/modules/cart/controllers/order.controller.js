@@ -67,7 +67,7 @@ export const makeCODOrder = catchAsyncError(async (req, res) => {
       ({ product_id: { title, description, discounted_price }, quantity }) => ({
         quantity,
         item: title,
-        description,
+        description:description.split(" ").slice(0, 2).join(" "),
         amount: discounted_price * 100 * quantity,
       })
     ),
