@@ -16,7 +16,7 @@ export const getUsersOrders = catchAsyncError(async (req, res) => {
   const apiFeatures = new ApiFeatures(
     orderModel.find({ user_id: req.user.id }),
     req.Query
-  ).paginate(10);
+  ).paginate(50);
   const orders = await apiFeatures.query;
   res.json({ orders });
 });
