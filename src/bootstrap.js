@@ -18,7 +18,7 @@ const bootstrap = (app) => {
         event = stripe.webhooks.constructEvent(
           request.body,
           sig,
-          process.env.STRIPE_WEBHOOK_SECRET
+          process.env.STRIPE_WEBHOOK_SECRET,
         );
       } catch (err) {
         response.status(400).send(`Webhook Error: ${err.message}`);
@@ -40,16 +40,20 @@ const bootstrap = (app) => {
 
       // Return a 200 response to acknowledge receipt of the event
       response.send();
-    })
+    }),
   );
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
 
   app.use(
     cors({
-      origin: "*", // replace 3000 with the port you are using
-    })
+      origin: "*",
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+    }),
   );
+
+  app.options("*", cors());
   app.use(morgan("dev"));
 
   app.use("/api/v1", v1Router);
