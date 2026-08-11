@@ -4,10 +4,14 @@ dotenv.config();
 
 export const transporter = createTransport({
   host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // true for 465, false for 587
+  port: 587,
+  secure: false,
+  requireTLS: true,
   auth: {
     user: process.env.EMAIL,
     pass: process.env.EMAIL_PASS,
   },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
 });
