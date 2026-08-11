@@ -8,14 +8,15 @@ import cartModel from "../models/cart.model.js";
 import orderModel from "../models/order.model.js";
 import userModel from "../../user/models/user.model.js";
 import { createInvoice } from "../../../utils/pdf.js";
-import { transporter } from "../../../utils/mailer.js";
+import { brevo } from "../../../utils/mailer.js";
+import fs from "fs";
 dotenv.config();
 const stripe = new Stripe(process.env.STRIPE_SECRET);
 
 export const getUsersOrders = catchAsyncError(async (req, res) => {
   const apiFeatures = new ApiFeatures(
     orderModel.find({ user_id: req.user.id }),
-    req.Query
+    req.Query,
   ).paginate(50);
   const orders = await apiFeatures.query;
   res.json({ orders });
@@ -38,7 +39,7 @@ export const makeCODOrder = catchAsyncError(async (req, res) => {
           price,
           discounted_price,
         },
-      })
+      }),
     ),
     ...req.body,
   });
@@ -53,7 +54,7 @@ export const makeCODOrder = catchAsyncError(async (req, res) => {
           },
         },
       },
-    })
+    }),
   );
   await productModel.bulkWrite(bulkWriteOptions);
   //make invoice
@@ -67,9 +68,9 @@ export const makeCODOrder = catchAsyncError(async (req, res) => {
       ({ product_id: { title, description, discounted_price }, quantity }) => ({
         quantity,
         item: title,
-        description:description.split(" ").slice(0, 2).join(" "),
+        description: description.split(" ").slice(0, 2).join(" "),
         amount: discounted_price * 100 * quantity,
-      })
+      }),
     ),
     subtotal: cart.total_price * 100,
     paid: 0,
@@ -77,12 +78,15 @@ export const makeCODOrder = catchAsyncError(async (req, res) => {
   };
 
   createInvoice(invoice, "invoice.pdf");
-  await transporter.sendMail({
-    to: req.user.email,
-    attachments: [
+  await brevo.transactionalEmails.sendTransacEmail({
+    sender: { email: "mostafaahmed3281@gmail.com", name: "Your App" },
+    to: [{ email: req.user.email }],
+    subject: "Your Invoice",
+    htmlContent: "<p>Please find your invoice attached.</p>",
+    attachment: [
       {
-        path: "invoice.pdf",
-        contentType: "application/pdf",
+        name: "invoice.pdf",
+        content: fs.readFileSync("invoice.pdf").toString("base64"),
       },
     ],
   });
@@ -142,7 +146,7 @@ export const makeOnlinePayment = async (data) => {
           price,
           discounted_price,
         },
-      })
+      }),
     ),
     phone_Number: metadata.phone,
     payment_type: "card",

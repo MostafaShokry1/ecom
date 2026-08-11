@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import { AppError, catchAsyncError } from "../../utils/error.handler.js";
 import userModel from "../user/models/user.model.js";
-import { transporter } from "../../utils/mailer.js";
+import { brevo } from "../../utils/mailer.js";
 dotenv.config();
 export const signin = catchAsyncError(async (req, res) => {
   const { email, password } = req.body;
@@ -24,12 +24,12 @@ export const signup = catchAsyncError(async (req, res) => {
   const { name, email, password } = req.body;
   const email_token = jwt.sign({ email }, process.env.SECRET_EMAIL);
   const link = process.env.LINK + `api/v1/auth/validate/${email_token}`;
-  await transporter.sendMail({
-    from: process.env.EMAIL,
-    to: email,
-    subject: "confirm Email",
-    text: "confirm your  Email",
-    html: `<a href=${link}>Click to vrify Email</a>`,
+  await brevo.transactionalEmails.sendTransacEmail({
+    sender: { email: "mostafaahmed3281@gmail.com", name: "Shokry" },
+    to: [{ email }],
+    subject: "Confirm Email",
+    textContent: "Confirm your Email",
+    htmlContent: `<a href="${link}">Click to verify Email</a>`,
   });
   const hashed = bcrypt.hashSync(password, +process.env.SALT);
 
@@ -78,12 +78,12 @@ export const forgotPassword = catchAsyncError(async (req, res) => {
   const resetLink = `${process.env.LINK}api/v1/auth/reset-password/${resetToken}`;
 
   // Send reset password email
-  await transporter.sendMail({
-    from: process.env.EMAIL,
-    to: email,
+  await brevo.transactionalEmails.sendTransacEmail({
+    sender: { email: "mostafaahmed3281@gmail.com", name: "Shokry" },
+    to: [{ email }],
     subject: "Reset Password",
-    text: "You requested to reset your password.",
-    html: `<a href="${resetLink}">Click here to reset your password</a>`,
+    textContent: "You requested to reset your password.",
+    htmlContent: `<a href="${resetLink}">Click here to reset your password</a>`,
   });
 
   res

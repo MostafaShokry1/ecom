@@ -1,10 +1,7 @@
-import { createTransport } from "nodemailer";
+import { BrevoClient } from "@getbrevo/brevo";
 import dotenv from "dotenv";
 dotenv.config();
-export const transporter = createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.EMAIL_PASS,
-  },
+
+export const brevo = new BrevoClient({
+  apiKey: process.env.BREVO_API_KEY,
 });
